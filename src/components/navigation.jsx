@@ -1,5 +1,5 @@
-import { isLoggedInVar } from "./apollo";
-import BasicMenu from "./basicmenu";
+import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 const Container = styled.div`
   display: flex;
@@ -22,6 +22,8 @@ const TopBox = styled(WhiteBox)`
   flex-direction: column;
   padding: 35px 40px 25px 40px;
   margin-bottom: 10px;
+  height: 50vh;
+
   form {
     margin-top: 35px;
     width: 100%;
@@ -32,39 +34,17 @@ const TopBox = styled(WhiteBox)`
     input {
       width: 100%;
       border-radius: 3px;
-      padding: 7px;
+      /* padding: 7px; */
       background-color: #fafafa;
       border: 0.5px solid rgb(219, 219, 219);
-      margin-top: 5px;
-      box-sizing: border-box;
-      &::placeholder {
-        font-size: 12px;
-      }
-      &:last-child {
-        border: none;
-        margin-top: 12px;
-        background-color: #0095f6;
-        color: white;
-        text-align: center;
-        padding: 8px 0px;
-        font-weight: 600;
-      }
+      /* margin-top: 5px; */
+      /* box-sizing: border-box; */
     }
   }
 `;
 
-const BottomBox = styled(WhiteBox)`
-  padding: 20px 0px;
-  text-align: center;
-
-  a {
-    font-weight: 600;
-    color: #0095f6;
-  }
-`;
-
 const Wrapper = styled.div`
-  max-width: 350px;
+  max-width: 500px;
   width: 100%;
 `;
 
@@ -86,15 +66,32 @@ const Separator = styled.div`
     color: #8e8e8e;
   }
 `;
-const Home = (props) => (
+
+const Navigation = styled.ul`
+  display: flex;
+  justify-content: space-evenly;
+  margin-bottom: 0.8em;
+`;
+const NavigationBase = (props) => (
   <Container>
     <Wrapper>
-      <TopBox>
-        <div>BecomeID</div>
-        <BasicMenu />
-      </TopBox>
+      <Navigation>
+        <li>
+          <Link to="/Home">Home</Link>
+        </li>
+        <li>
+          <Link to="/register">Register ID</Link>
+        </li>
+        <li>
+          <Link to="/findconnect">Find & Connect</Link>
+        </li>
+        <li>
+          <Link to="/profile">Profile</Link>
+        </li>
+      </Navigation>
+      <TopBox>{props.children}</TopBox>
     </Wrapper>
   </Container>
 );
 
-export default Home;
+export default NavigationBase;

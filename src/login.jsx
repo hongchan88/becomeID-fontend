@@ -1,5 +1,5 @@
 import React from "react";
-import { isLoggedInVar } from "./apollo";
+import { isLoggedInVar, logUserIn } from "./apollo";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import Button from "./Button";
@@ -108,6 +108,7 @@ const Login = (props) => {
     handleSubmit,
     formState: { errors, isValid },
     setError,
+    clearErrors,
   } = useForm({
     mode: "onChange",
   });
@@ -118,6 +119,9 @@ const Login = (props) => {
     } = data;
     if (!ok) {
       setError("result", { message: error });
+    }
+    if (token) {
+      logUserIn(token);
     }
   };
   console.log(errors);
@@ -145,12 +149,14 @@ const Login = (props) => {
               name="email"
               type="text"
               placeholder="Email"
+              onFocus={() => clearErrors("result")}
             />
             <input
               {...register("password", { required: "Password is required" })}
               name="password"
               type="password"
               placeholder="Password"
+              onFocus={() => clearErrors("result")}
             />
             <FormError message={errors?.result?.message} />
             <Button
