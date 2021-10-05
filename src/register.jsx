@@ -16,6 +16,7 @@ const Wrapper = styled.div`
 
 const Input = styled.input`
   width: 100%;
+
   border-radius: 3px;
   padding: 7px;
   background-color: #fafafa;
@@ -27,6 +28,11 @@ const Input = styled.input`
 const SuccessMsg = styled.span`
   height: 2em;
 `;
+
+const RegisterForm = styled.div`
+  display: flex;
+`;
+
 const EDIT_PROFILE = gql`
   mutation editProfile($car_plates: String, $email: String) {
     editProfile(car_plates: $car_plates, email: $email) {
@@ -53,6 +59,7 @@ const Register = (props) => {
     formState: { errors, isValid },
     setError,
     reset,
+    clearErrors,
   } = useForm({
     mode: "onChange",
   });
@@ -86,11 +93,9 @@ const Register = (props) => {
       },
     });
   };
-  console.log(data);
+  console.log(errors);
   return (
     <NavigationBase>
-      <div>Register</div>
-
       <div>
         Registered car plate :
         {!getProfileLoading ? data?.getprofile?.car_plates : null}
@@ -106,16 +111,25 @@ const Register = (props) => {
           ) : null}
         </SuccessMsg>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Input
-            type="text"
-            placeholder="Car plate"
-            {...register("car_plates")}
-            onChange={() => setSuccessmsgShow(false)}
-          />
-          <button type="submit" disabled={!isValid}>
-            Register
-          </button>
+          <RegisterForm>
+            <Input
+              type="text"
+              placeholder="Car plate"
+              {...register("car_plates", { minLength: 3, required: true })}
+              onChange={() => {
+                setSuccessmsgShow(false);
+                clearErrors();
+              }}
+            />
+            <button type="submit">Register</button>
+          </RegisterForm>
         </form>
+        {errors?.car_plates?.type === "minLength" ? (
+          <FormError message="Car plate must be more than 3 letter" />
+        ) : null}
+        {errors?.car_plates?.type === "required" ? (
+          <FormError message="Please put car plate number" />
+        ) : null}
         <FormError message={errors?.result?.message} />
       </Wrapper>
       <Wrapper></Wrapper>

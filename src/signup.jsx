@@ -3,6 +3,8 @@ import { isLoggedInVar } from "./apollo";
 import styled from "styled-components";
 import { useForm, useFormState } from "react-hook-form";
 import Button from "./Button";
+import { gql, useMutation } from "@apollo/client";
+import FormError from "./formerror";
 
 const Container = styled.div`
   display: flex;
@@ -80,11 +82,56 @@ const Separator = styled.div`
   }
 `;
 
+const CREATE_ACCOUNT = gql`
+  mutation createAccount(
+    $car_plates: String
+    $email: String!
+    $password: String!
+  ) {
+    createAccount(car_plates: $car_plates, email: $email, password: $password) {
+      ok
+      error
+    }
+  }
+`;
+
 const Signup = (props) => {
-  const { register, handleSubmit, formState } = useForm({ mode: "onChange" });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    setError,
+  } = useForm({ mode: "onChange" });
+  const onCompleted = (data) => {
+    const {
+      createAccount: { error, ok },
+    } = data;
+    if (!ok) {
+      setError("result", { message: error });
+    }
+    console.log(data);
+  };
+
+  const [createAccount, { loading }] = useMutation(CREATE_ACCOUNT, {
+    onCompleted,
+  });
 
   const onSubmitValid = (data) => {
+    if (loading) {
+      return;
+    }
+    if (data.password !== data.passwordConfirm) {
+      setError("result", { message: "password not matching" });
+      return;
+    }
     console.log(data);
+    createAccount({
+      variables: {
+        email: data.email,
+        password: data.password,
+        car_plates: data.car_plates,
+      },
+    });
   };
   const onSubmitInValid = (data) => {
     console.log(data);
@@ -96,7 +143,16 @@ const Signup = (props) => {
           <div>Sign up</div>
 
           <form onSubmit={handleSubmit(onSubmitValid, onSubmitInValid)}>
-            <input type="text" placeholder="email" />
+            <input
+              type="text"
+              placeholder="email"
+              {...register("email", { required: "Email is required" })}
+            />
+            <input
+              type="text"
+              placeholder="Car plate"
+              {...register("car_plates", { required: "Car plate is required" })}
+            />
             {/* <input
               {...register("carPlate", {
                 required: "carPlate is required",
@@ -109,14 +165,25 @@ const Signup = (props) => {
               type="text"
               placeholder="car plate number"
             /> */}
-            <input type="password" placeholder="Password" />
-            <input type="password" placeholder="Password Confirm" />
+            <input
+              type="password"
+              placeholder="Password"
+              {...register("password", { required: "password is required" })}
+            />
+            <input
+              type="password"
+              placeholder="Password Confirm"
+              {...register("passwordConfirm", {
+                required: "password confirmation is required",
+              })}
+            />
             <Button
               type="submit"
               value="Sign up"
-              disabled={!formState.isValid}
+              disabled={!isValid || loading}
             />
           </form>
+          <FormError message={errors?.result?.message} />
         </TopBox>
       </Wrapper>
     </Container>

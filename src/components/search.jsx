@@ -6,9 +6,8 @@ const Search = ({ data }) => {
     return { ...key };
   });
 
-  console.log(data[0]);
   return (
-    <div style={{ maxWidth: "100%", marginTop: "2em" }}>
+    <div style={{ width: "95%", height: "95%" }}>
       <MaterialTable
         title=""
         columns={[

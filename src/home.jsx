@@ -95,9 +95,7 @@ const Navigation = styled.ul`
 `;
 const Home = (props) => (
   <NavigationBase>
-    <div>This is Home</div>
     <div>Register your ID to allow people to reach you by registered ID</div>
-    <button onClick={() => logUserOut()}>Log out</button>
   </NavigationBase>
 );
 

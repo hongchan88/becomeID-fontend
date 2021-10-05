@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { logUserOut } from "../apollo";
 const Container = styled.div`
   display: flex;
   height: 100vh;
@@ -72,6 +73,14 @@ const Navigation = styled.ul`
   justify-content: space-evenly;
   margin-bottom: 0.8em;
 `;
+const Logout = styled.div`
+  display: relative;
+`;
+
+const LogoutBtn = styled.div`
+  display: absolute;
+  right: 10px;
+`;
 const NavigationBase = (props) => (
   <Container>
     <Wrapper>
@@ -88,7 +97,13 @@ const NavigationBase = (props) => (
         <li>
           <Link to="/profile">Profile</Link>
         </li>
+        <li>
+          <Link to="/" onClick={() => logUserOut()}>
+            Log out
+          </Link>
+        </li>
       </Navigation>
+
       <TopBox>{props.children}</TopBox>
     </Wrapper>
   </Container>

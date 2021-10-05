@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import NavigationBase from "./components/navigation";
 
@@ -24,13 +24,16 @@ const GET_ALL_USER = gql`
 const Findconnect = (props) => {
   const { loading, error, data, refetch } = useQuery(GET_ALL_USER);
 
+  useEffect(() => {
+    refetch();
+    console.log("refetched");
+  }, []);
+
   const onChange = () => {
     console.log("changed");
   };
   return (
     <NavigationBase>
-      <div>Find connect</div>
-
       <Wrapper>{!loading ? <Search data={data.allCarPlate} /> : null}</Wrapper>
     </NavigationBase>
   );
