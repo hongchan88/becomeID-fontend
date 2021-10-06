@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import Button from "./Button";
 import { gql, useMutation } from "@apollo/client";
 import FormError from "./formerror";
+import { useLocation } from "react-router-dom";
+import FormSuccess from "./components/formsuccess";
 
 const Container = styled.div`
   display: flex;
@@ -103,6 +105,8 @@ const LOGIN_MUTATION = gql`
 `;
 
 const Login = (props) => {
+  const location = useLocation();
+  console.log(location?.state);
   const {
     register,
     handleSubmit,
@@ -111,6 +115,10 @@ const Login = (props) => {
     clearErrors,
   } = useForm({
     mode: "onChange",
+    defaultValues: {
+      email: location?.state?.email || "",
+      password: location?.state?.password || "",
+    },
   });
 
   const onCompleted = (data) => {
@@ -143,6 +151,7 @@ const Login = (props) => {
       <Wrapper>
         <TopBox>
           <div>BecomeID</div>
+          <FormSuccess message={location?.state?.message} />
           <form onSubmit={handleSubmit(onSubmitValid)}>
             <input
               {...register("email", { required: "Email is required" })}

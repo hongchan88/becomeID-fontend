@@ -24,7 +24,8 @@ const TopBox = styled(WhiteBox)`
   padding: 35px 40px 25px 40px;
   margin-bottom: 10px;
   height: 50vh;
-
+  font-size: 1.2rem;
+  color: #808080;
   form {
     margin-top: 35px;
     width: 100%;
@@ -33,13 +34,8 @@ const TopBox = styled(WhiteBox)`
     flex-direction: column;
     align-items: center;
     input {
-      width: 100%;
-      border-radius: 3px;
-      /* padding: 7px; */
-      background-color: #fafafa;
-      border: 0.5px solid rgb(219, 219, 219);
-      /* margin-top: 5px; */
-      /* box-sizing: border-box; */
+    
+    
     }
   }
 `;

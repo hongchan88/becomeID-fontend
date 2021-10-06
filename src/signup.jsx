@@ -5,6 +5,7 @@ import { useForm, useFormState } from "react-hook-form";
 import Button from "./Button";
 import { gql, useMutation } from "@apollo/client";
 import FormError from "./formerror";
+import { useHistory } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -96,12 +97,16 @@ const CREATE_ACCOUNT = gql`
 `;
 
 const Signup = (props) => {
+  const history = useHistory();
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     setError,
+    clearErrors,
+    getValues,
   } = useForm({ mode: "onChange" });
+  const { email, password } = getValues();
   const onCompleted = (data) => {
     const {
       createAccount: { error, ok },
@@ -109,7 +114,14 @@ const Signup = (props) => {
     if (!ok) {
       setError("result", { message: error });
     }
-    console.log(data);
+    if(ok){
+      history.push("/", {
+        message: "Account created. Please log in.",
+        email,
+        password,
+      });
+    }
+   
   };
 
   const [createAccount, { loading }] = useMutation(CREATE_ACCOUNT, {
@@ -147,11 +159,13 @@ const Signup = (props) => {
               type="text"
               placeholder="email"
               {...register("email", { required: "Email is required" })}
+              onFocus={() => clearErrors("result")}
             />
             <input
               type="text"
               placeholder="Car plate"
               {...register("car_plates", { required: "Car plate is required" })}
+              onFocus={() => clearErrors("result")}
             />
             {/* <input
               {...register("carPlate", {
@@ -169,6 +183,7 @@ const Signup = (props) => {
               type="password"
               placeholder="Password"
               {...register("password", { required: "password is required" })}
+              onFocus={() => clearErrors("result")}
             />
             <input
               type="password"
@@ -176,6 +191,7 @@ const Signup = (props) => {
               {...register("passwordConfirm", {
                 required: "password confirmation is required",
               })}
+              onFocus={() => clearErrors("result")}
             />
             <Button
               type="submit"

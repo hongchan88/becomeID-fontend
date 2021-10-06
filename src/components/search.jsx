@@ -1,13 +1,14 @@
 import React from "react";
 
 import MaterialTable from "material-table";
+
 const Search = ({ data }) => {
   const resultData = data.map((key) => {
     return { ...key };
   });
 
   return (
-    <div style={{ width: "95%", height: "95%" }}>
+    <div style={{ width: "95%", height: "95%", fontSize: "0.8rem" }}>
       <MaterialTable
         title=""
         columns={[
