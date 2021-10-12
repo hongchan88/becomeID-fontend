@@ -18,6 +18,7 @@ const GET_ALL_USER = gql`
     allCarPlate {
       car_plates
       email
+      id
     }
   }
 `;

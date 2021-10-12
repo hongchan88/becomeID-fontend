@@ -29,6 +29,7 @@ const TopBox = styled(WhiteBox)`
   form {
     margin-top: 35px;
     width: 100%;
+    
     display: flex;
     justify-items: center;
     flex-direction: column;
