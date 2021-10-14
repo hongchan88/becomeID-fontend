@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { useLocation } from "react-router-dom";
 import NavigationBase from "./components/navigation";
@@ -30,12 +30,14 @@ const SEE_ROOM_QUERY = gql`
     }
   }
 `;
+
 const InputContainer = styled.div`
+  display: flex;
   width: 100%;
-  margin-bottom: 50px;
-  margin-top: 25px;
-  flex-direction: row;
-  align-items: center;
+`;
+
+const Button = styled.button`
+  width: 30%;
 `;
 
 const TextInput = styled.input`
@@ -44,28 +46,43 @@ const TextInput = styled.input`
   color: black;
   border-radius: 10px;
   width: 70%;
-  margin-right: 10px;
+`;
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  width: 100%;
+`;
+const MessageWrapper = styled.div`
+  display: flex;
+
+  flex-direction: column;
+  overflow-y: scroll;
+  min-height: 80%;
 `;
 
 const MessageContainer = styled.div`
   padding: 5px 10px;
   display: flex;
-  justify-content: ${(props) => (props.outGoing ? "flex-end" : "flex-start")};
+  justify-content: ${(props) => (props.outGoing ? "flex-start" : "flex-end")};
   width: 100%;
 `;
 
 const Message = styled.div`
   display: flex;
   color: black;
-  background-color: gray;
+  border: solid 0.2px grey;
+  background-color: ${(props) => (props.outGoing ? "white" : "grey")};
   padding: 5px 10px;
-  overflow: hidden;
+
   border-radius: 10px;
   font-size: 16px;
   margin: 0px 10px;
 `;
 
 const Profile = (props) => {
+  const MessageScroll = useRef();
   const { data: meData } = useMe();
   const location = useLocation();
   const { register, reset, setValue, handleSubmit, getValues } = useForm();
@@ -80,6 +97,7 @@ const Profile = (props) => {
     if (ok && meData) {
       const { message } = getValues();
       setValue("message", "");
+
       const messageObj = {
         id,
         messages: {
@@ -114,6 +132,8 @@ const Profile = (props) => {
           },
         },
       });
+
+      console.log(MessageScroll.current);
     }
   };
   const [sendMessageMutation, { loading: sendingMessage }] = useMutation(
@@ -144,33 +164,49 @@ const Profile = (props) => {
     },
   });
 
-  if (!loading) {
-    console.log(seeRoomData.seeRoom.messages);
-  }
+  useEffect(() => {
+    if (MessageScroll.current) {
+      MessageScroll.current.scrollIntoView({
+        block: "end",
+      });
+    }
+  }, [seeRoomData]);
+
   return (
     <NavigationBase>
-      {!loading &&
-        seeRoomData.seeRoom.messages.map((message) => {
-          return (
-            <MessageContainer
-              outGoing={message.user.id !== location?.state?.id}
-            >
-              <Message>
-                {location?.state?.id == message.user.id
-                  ? message.user.car_plates
-                  : "You"}
-                : {message.payload}
-              </Message>
-            </MessageContainer>
-          );
-        })}
-      <InputContainer>
+      <Container>
+        <MessageWrapper>
+          {!loading &&
+            seeRoomData.seeRoom.messages.map((message) => {
+              return (
+                <MessageContainer
+                  outGoing={message.user.id !== location?.state?.id}
+                >
+                  <Message
+                    ref={MessageScroll}
+                    outGoing={message.user.id !== location?.state?.id}
+                  >
+                    {location?.state?.id == message.user.id
+                      ? message.user.car_plates
+                      : "You"}
+                    : {message.payload}
+                  </Message>
+                </MessageContainer>
+              );
+            })}
+        </MessageWrapper>
+
         <form onSubmit={handleSubmit(onValid)}>
-          <TextInput {...register("message", { required: true })} type="text" />
-          <button>SEND</button>
+          <InputContainer>
+            <TextInput
+              {...register("message", { required: true })}
+              type="text"
+            />
+
+            <Button>SEND</Button>
+          </InputContainer>
         </form>
-      </InputContainer>
-      <div>This is Profile</div>
+      </Container>
     </NavigationBase>
   );
 };

@@ -14,3 +14,11 @@ To view becomeID-backend with Prisma + Apollo + Graphql **[click here](https://g
 - [x] Navigation ( home / register Id / find & connect / profile)\
 - [x] search component in find & connect\
 - [x] save token on localstroage and http headers
+
+- [x] useQuery , useMutation from apollo
+- [x]
+
+## live chatting function
+
+- [] apollo subscription\
+- [] message write fragment in cache , modify cache\
