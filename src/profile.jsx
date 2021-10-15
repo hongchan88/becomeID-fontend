@@ -1,11 +1,24 @@
-import React, { useEffect, useRef } from "react";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
+import { useLocation, useHistory } from "react-router-dom";
 import NavigationBase from "./components/navigation";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { storeValueIsStoreObject } from "@apollo/client/cache/inmemory/helpers";
 import useMe from "./hook/useMe";
+
+const ROOM_UPDATES = gql`
+  subscription roomUpdates($id: Int!) {
+    roomUpdates(id: $id) {
+      id
+      payload
+      user {
+        id
+        car_plates
+      }
+    }
+  }
+`;
 
 const SEND_MESSAGE_MUTATION = gql`
   mutation sendMessage($payload: String!, $roomId: Int, $userId: Int) {
@@ -21,6 +34,7 @@ const SEE_ROOM_QUERY = gql`
     seeRoom(id: $id) {
       id
       messages {
+        id
         payload
         user {
           id
@@ -85,6 +99,8 @@ const Profile = (props) => {
   const MessageScroll = useRef();
   const { data: meData } = useMe();
   const location = useLocation();
+  const history = useHistory();
+
   const { register, reset, setValue, handleSubmit, getValues } = useForm();
   const updateSendMessage = (cache, result) => {
     const {
@@ -92,7 +108,6 @@ const Profile = (props) => {
         sendMessage: { ok, id },
       },
     } = result;
-    console.log(result);
 
     if (ok && meData) {
       const { message } = getValues();
@@ -100,30 +115,28 @@ const Profile = (props) => {
 
       const messageObj = {
         id,
-        messages: {
-          payload: message,
-          user: {
-            id: meData.me.id,
-            car_plates: meData.me.car_plates,
-          },
+        payload: message,
+        user: {
+          id: meData.me.id,
+          car_plates: meData.me.car_plates,
         },
+
         __typename: "Message",
       };
       const messageFragment = cache.writeFragment({
         fragment: gql`
           fragment NewMessage on Message {
             id
-            messages {
-              payload
-              user {
-                id
-                car_plates
-              }
+            payload
+            user {
+              id
+              car_plates
             }
           }
         `,
         data: messageObj,
       });
+      console.log(cache, "cache");
       cache.modify({
         id: `Room:${seeRoomData?.seeRoom?.id}`,
         fields: {
@@ -158,11 +171,68 @@ const Profile = (props) => {
     data: seeRoomData,
     error,
     loading,
+    subscribeToMore,
   } = useQuery(SEE_ROOM_QUERY, {
     variables: {
       id: location?.state?.id,
     },
   });
+
+  const [subscribed, setSubscribed] = useState(false);
+  const client = useApolloClient();
+  const updateQuery = (preQuery, options) => {
+    const {
+      subscriptionData: {
+        data: { roomUpdates: messageData },
+      },
+    } = options;
+    console.log(preQuery);
+    console.log("-------------");
+    console.log(options);
+    console.log(messageData);
+
+    if (messageData.id) {
+      const incomingMessage = client.cache.writeFragment({
+        fragment: gql`
+          fragment NewMessage on Message {
+            id
+            payload
+            user {
+              id
+              car_plates
+            }
+          }
+        `,
+        data: messageData,
+      });
+      client.cache.modify({
+        id: `Room:${seeRoomData?.seeRoom?.id}`,
+        fields: {
+          messages(prev) {
+            const existingMessages = prev.find(
+              (aMessage) => aMessage.__ref === incomingMessage.__ref
+            );
+            if (existingMessages) {
+              return prev;
+            }
+            return [...prev, incomingMessage];
+          },
+        },
+      });
+    }
+  };
+  useEffect(() => {
+    if (seeRoomData?.seeRoom) {
+      subscribeToMore({
+        document: ROOM_UPDATES,
+        variables: {
+          id: seeRoomData?.seeRoom.id,
+        },
+        updateQuery,
+      });
+      setSubscribed(true);
+    }
+  }, [seeRoomData, subscribed]);
 
   useEffect(() => {
     if (MessageScroll.current) {

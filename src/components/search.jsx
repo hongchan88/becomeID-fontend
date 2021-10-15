@@ -3,7 +3,7 @@ import React from "react";
 import MaterialTable from "material-table";
 import { useHistory } from "react-router-dom";
 
-const Search = ({ data }) => {
+const Search = ({ data, myId }) => {
   const resultData = data.map((key) => {
     return { ...key };
   });
@@ -24,9 +24,13 @@ const Search = ({ data }) => {
             icon: "message",
             tooltip: "Message User",
             onClick: (event, rowData) => {
-              history.push("/profile", {
-                id: rowData.id,
-              });
+              if (myId !== rowData.id) {
+                history.push("/profile", {
+                  id: rowData.id,
+                });
+              } else {
+                alert("Can't message to myself.");
+              }
             },
           },
         ]}

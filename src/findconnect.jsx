@@ -5,6 +5,7 @@ import NavigationBase from "./components/navigation";
 import SearchField from "react-search-field";
 import Search from "./components/search";
 import { gql, useQuery } from "@apollo/client";
+import useMe from "./hook/useMe";
 
 const Wrapper = styled.div`
   display: flex;
@@ -23,6 +24,7 @@ const GET_ALL_USER = gql`
   }
 `;
 const Findconnect = (props) => {
+  const { data: meData } = useMe();
   const { loading, error, data, refetch } = useQuery(GET_ALL_USER);
 
   useEffect(() => {
@@ -35,7 +37,11 @@ const Findconnect = (props) => {
   };
   return (
     <NavigationBase>
-      <Wrapper>{!loading ? <Search data={data.allCarPlate} /> : null}</Wrapper>
+      <Wrapper>
+        {!loading ? (
+          <Search data={data.allCarPlate} myId={meData?.me?.id} />
+        ) : null}
+      </Wrapper>
     </NavigationBase>
   );
 };
