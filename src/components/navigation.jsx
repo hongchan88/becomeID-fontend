@@ -29,14 +29,12 @@ const TopBox = styled(WhiteBox)`
   form {
     margin-top: 35px;
     width: 100%;
-    
+
     display: flex;
     justify-items: center;
     flex-direction: column;
     align-items: center;
     input {
-    
-    
     }
   }
 `;
@@ -92,7 +90,7 @@ const NavigationBase = (props) => (
           <Link to="/findconnect">Find & Connect</Link>
         </li>
         <li>
-          <Link to="/profile">Profile</Link>
+          <Link to="/rooms">Messages</Link>
         </li>
         <li>
           <Link to="/" onClick={() => logUserOut()}>

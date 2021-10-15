@@ -1,11 +1,9 @@
+import { gql, useQuery } from "@apollo/client";
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import NavigationBase from "./components/navigation";
-
-import SearchField from "react-search-field";
-import Search from "./components/search";
-import { gql, useQuery } from "@apollo/client";
-import useMe from "./hook/useMe";
+import NavigationBase from "../components/navigation";
+import Search from "../components/search";
+import useMe from "../hook/useMe";
 
 const Wrapper = styled.div`
   display: flex;
@@ -32,9 +30,6 @@ const Findconnect = (props) => {
     console.log("refetched");
   }, []);
 
-  const onChange = () => {
-    console.log("changed");
-  };
   return (
     <NavigationBase>
       <Wrapper>

@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
 import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client";
-import { useLocation, useHistory } from "react-router-dom";
-import NavigationBase from "./components/navigation";
-import styled from "styled-components";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { storeValueIsStoreObject } from "@apollo/client/cache/inmemory/helpers";
-import useMe from "./hook/useMe";
+import { useHistory, useLocation } from "react-router-dom";
+import styled from "styled-components";
+import NavigationBase from "../components/navigation";
+import useMe from "../hook/useMe";
 
 const ROOM_UPDATES = gql`
   subscription roomUpdates($id: Int!) {
@@ -95,11 +94,10 @@ const Message = styled.div`
   margin: 0px 10px;
 `;
 
-const Profile = (props) => {
+const Room = (props) => {
   const MessageScroll = useRef();
   const { data: meData } = useMe();
   const location = useLocation();
-  const history = useHistory();
 
   const { register, reset, setValue, handleSubmit, getValues } = useForm();
   const updateSendMessage = (cache, result) => {
@@ -247,7 +245,7 @@ const Profile = (props) => {
       <Container>
         <MessageWrapper>
           {!loading &&
-            seeRoomData.seeRoom.messages.map((message) => {
+            seeRoomData?.seeRoom?.messages.map((message) => {
               return (
                 <MessageContainer
                   outGoing={message.user.id !== location?.state?.id}
@@ -281,4 +279,4 @@ const Profile = (props) => {
   );
 };
 
-export default Profile;
+export default Room;

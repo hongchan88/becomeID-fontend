@@ -1,12 +1,10 @@
-import React from "react";
-import { isLoggedInVar, logUserIn } from "./apollo";
-import styled from "styled-components";
-import { useForm } from "react-hook-form";
-import Button from "./Button";
 import { gql, useMutation } from "@apollo/client";
-import FormError from "./formerror";
-import { useLocation } from "react-router-dom";
-import FormSuccess from "./components/formsuccess";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useHistory } from "react-router-dom";
+import styled from "styled-components";
+import Button from "../components/Button";
+import FormError from "../components/formerror";
 
 const Container = styled.div`
   display: flex;
@@ -60,16 +58,6 @@ const TopBox = styled(WhiteBox)`
   }
 `;
 
-const BottomBox = styled(WhiteBox)`
-  padding: 20px 0px;
-  text-align: center;
-
-  a {
-    font-weight: 600;
-    color: #0095f6;
-  }
-`;
-
 const Wrapper = styled.div`
   max-width: 350px;
   width: 100%;
@@ -94,98 +82,126 @@ const Separator = styled.div`
   }
 `;
 
-const LOGIN_MUTATION = gql`
-  mutation login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
+const CREATE_ACCOUNT = gql`
+  mutation createAccount(
+    $car_plates: String
+    $email: String!
+    $password: String!
+  ) {
+    createAccount(car_plates: $car_plates, email: $email, password: $password) {
       ok
-      token
       error
     }
   }
 `;
 
-const Login = (props) => {
-  const location = useLocation();
-  console.log(location?.state);
+const Signup = (props) => {
+  const history = useHistory();
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     setError,
     clearErrors,
-  } = useForm({
-    mode: "onChange",
-    defaultValues: {
-      email: location?.state?.email || "",
-      password: location?.state?.password || "",
-    },
-  });
-
+    getValues,
+  } = useForm({ mode: "onChange" });
+  const { email, password } = getValues();
   const onCompleted = (data) => {
     const {
-      login: { error, ok, token },
+      createAccount: { error, ok },
     } = data;
     if (!ok) {
       setError("result", { message: error });
     }
-    if (token) {
-      logUserIn(token);
+    if (ok) {
+      history.push("/", {
+        message: "Account created. Please log in.",
+        email,
+        password,
+      });
     }
   };
-  console.log(errors);
-  const [login, { loading }] = useMutation(LOGIN_MUTATION, { onCompleted });
+
+  const [createAccount, { loading }] = useMutation(CREATE_ACCOUNT, {
+    onCompleted,
+  });
 
   const onSubmitValid = (data) => {
     if (loading) {
       return;
     }
-    login({
+    if (data.password !== data.passwordConfirm) {
+      setError("result", { message: "password not matching" });
+      return;
+    }
+    console.log(data);
+    createAccount({
       variables: {
-        ...data,
+        email: data.email,
+        password: data.password,
+        car_plates: data.car_plates,
       },
     });
   };
-
+  const onSubmitInValid = (data) => {
+    console.log(data);
+  };
   return (
     <Container>
       <Wrapper>
         <TopBox>
-          <div>BecomeID</div>
-          <FormSuccess message={location?.state?.message} />
-          <form onSubmit={handleSubmit(onSubmitValid)}>
+          <div>Sign up</div>
+
+          <form onSubmit={handleSubmit(onSubmitValid, onSubmitInValid)}>
             <input
-              {...register("email", { required: "Email is required" })}
-              name="email"
               type="text"
-              placeholder="Email"
+              placeholder="email"
+              {...register("email", { required: "Email is required" })}
               onFocus={() => clearErrors("result")}
             />
             <input
-              {...register("password", { required: "Password is required" })}
-              name="password"
+              type="text"
+              placeholder="Car plate"
+              {...register("car_plates", { required: "Car plate is required" })}
+              onFocus={() => clearErrors("result")}
+            />
+            {/* <input
+              {...register("carPlate", {
+                required: "carPlate is required",
+                minLength: {
+                  value: 5,
+                  message: "Plates must be more than 5 chars",
+                },
+              })}
+              name="carPlate"
+              type="text"
+              placeholder="car plate number"
+            /> */}
+            <input
               type="password"
               placeholder="Password"
+              {...register("password", { required: "password is required" })}
               onFocus={() => clearErrors("result")}
             />
-            <FormError message={errors?.result?.message} />
+            <input
+              type="password"
+              placeholder="Password Confirm"
+              {...register("passwordConfirm", {
+                required: "password confirmation is required",
+              })}
+              onFocus={() => clearErrors("result")}
+            />
             <Button
               type="submit"
-              value={loading ? "Loading ..." : "Log in"}
+              value="Sign up"
               disabled={!isValid || loading}
             />
           </form>
-
-          <Separator>
-            <div></div>
-            <span>Or</span>
-            <div></div>
-          </Separator>
+          <FormError message={errors?.result?.message} />
         </TopBox>
-        <BottomBox>
-          <span>Don't have an account?</span> <a href="/signup">Sign up</a>
-        </BottomBox>
       </Wrapper>
     </Container>
   );
 };
-export default Login;
+
+export default Signup;

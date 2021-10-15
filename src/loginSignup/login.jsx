@@ -1,11 +1,12 @@
-import React from "react";
-import { isLoggedInVar } from "./apollo";
-import styled from "styled-components";
-import { useForm, useFormState } from "react-hook-form";
-import Button from "./Button";
 import { gql, useMutation } from "@apollo/client";
-import FormError from "./formerror";
-import { useHistory } from "react-router-dom";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useLocation } from "react-router-dom";
+import styled from "styled-components";
+import { logUserIn } from "../apollo";
+import Button from "../components/Button";
+import FormError from "../components/formerror";
+import FormSuccess from "../components/formsuccess";
 
 const Container = styled.div`
   display: flex;
@@ -59,6 +60,16 @@ const TopBox = styled(WhiteBox)`
   }
 `;
 
+const BottomBox = styled(WhiteBox)`
+  padding: 20px 0px;
+  text-align: center;
+
+  a {
+    font-weight: 600;
+    color: #0095f6;
+  }
+`;
+
 const Wrapper = styled.div`
   max-width: 350px;
   width: 100%;
@@ -83,127 +94,98 @@ const Separator = styled.div`
   }
 `;
 
-const CREATE_ACCOUNT = gql`
-  mutation createAccount(
-    $car_plates: String
-    $email: String!
-    $password: String!
-  ) {
-    createAccount(car_plates: $car_plates, email: $email, password: $password) {
+const LOGIN_MUTATION = gql`
+  mutation login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
       ok
+      token
       error
     }
   }
 `;
 
-const Signup = (props) => {
-  const history = useHistory();
+const Login = (props) => {
+  const location = useLocation();
+  console.log(location?.state);
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     setError,
     clearErrors,
-    getValues,
-  } = useForm({ mode: "onChange" });
-  const { email, password } = getValues();
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      email: location?.state?.email || "",
+      password: location?.state?.password || "",
+    },
+  });
+
   const onCompleted = (data) => {
     const {
-      createAccount: { error, ok },
+      login: { error, ok, token },
     } = data;
     if (!ok) {
       setError("result", { message: error });
     }
-    if(ok){
-      history.push("/", {
-        message: "Account created. Please log in.",
-        email,
-        password,
-      });
+    if (token) {
+      logUserIn(token);
     }
-   
   };
-
-  const [createAccount, { loading }] = useMutation(CREATE_ACCOUNT, {
-    onCompleted,
-  });
+  console.log(errors);
+  const [login, { loading }] = useMutation(LOGIN_MUTATION, { onCompleted });
 
   const onSubmitValid = (data) => {
     if (loading) {
       return;
     }
-    if (data.password !== data.passwordConfirm) {
-      setError("result", { message: "password not matching" });
-      return;
-    }
-    console.log(data);
-    createAccount({
+    login({
       variables: {
-        email: data.email,
-        password: data.password,
-        car_plates: data.car_plates,
+        ...data,
       },
     });
   };
-  const onSubmitInValid = (data) => {
-    console.log(data);
-  };
+
   return (
     <Container>
       <Wrapper>
         <TopBox>
-          <div>Sign up</div>
-
-          <form onSubmit={handleSubmit(onSubmitValid, onSubmitInValid)}>
+          <div>BecomeID</div>
+          <FormSuccess message={location?.state?.message} />
+          <form onSubmit={handleSubmit(onSubmitValid)}>
             <input
-              type="text"
-              placeholder="email"
               {...register("email", { required: "Email is required" })}
+              name="email"
+              type="text"
+              placeholder="Email"
               onFocus={() => clearErrors("result")}
             />
             <input
-              type="text"
-              placeholder="Car plate"
-              {...register("car_plates", { required: "Car plate is required" })}
-              onFocus={() => clearErrors("result")}
-            />
-            {/* <input
-              {...register("carPlate", {
-                required: "carPlate is required",
-                minLength: {
-                  value: 5,
-                  message: "Plates must be more than 5 chars",
-                },
-              })}
-              name="carPlate"
-              type="text"
-              placeholder="car plate number"
-            /> */}
-            <input
+              {...register("password", { required: "Password is required" })}
+              name="password"
               type="password"
               placeholder="Password"
-              {...register("password", { required: "password is required" })}
               onFocus={() => clearErrors("result")}
             />
-            <input
-              type="password"
-              placeholder="Password Confirm"
-              {...register("passwordConfirm", {
-                required: "password confirmation is required",
-              })}
-              onFocus={() => clearErrors("result")}
-            />
+            <FormError message={errors?.result?.message} />
             <Button
               type="submit"
-              value="Sign up"
+              value={loading ? "Loading ..." : "Log in"}
               disabled={!isValid || loading}
             />
           </form>
-          <FormError message={errors?.result?.message} />
+
+          <Separator>
+            <div></div>
+            <span>Or</span>
+            <div></div>
+          </Separator>
         </TopBox>
+        <BottomBox>
+          <span>Don't have an account?</span> <a href="/signup">Sign up</a>
+        </BottomBox>
       </Wrapper>
     </Container>
   );
 };
-
-export default Signup;
+export default Login;

@@ -1,5 +1,3 @@
-import { isLoggedInVar, logUserOut } from "./apollo";
-import BasicMenu from "./basicmenu";
 import styled from "styled-components";
 import NavigationBase from "./components/navigation";
 

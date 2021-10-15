@@ -1,6 +1,5 @@
-import React from "react";
-
 import MaterialTable from "material-table";
+import React from "react";
 import { useHistory } from "react-router-dom";
 
 const Search = ({ data, myId }) => {
@@ -25,7 +24,7 @@ const Search = ({ data, myId }) => {
             tooltip: "Message User",
             onClick: (event, rowData) => {
               if (myId !== rowData.id) {
-                history.push("/profile", {
+                history.push("/room", {
                   id: rowData.id,
                 });
               } else {

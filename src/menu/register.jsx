@@ -1,13 +1,10 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { common } from "@mui/material/colors";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
-import Basicbutton from "./components/basicbutton";
-import FormSuccess from "./components/formsuccess";
-import NavigationBase from "./components/navigation";
-import Textfield from "./components/textfields";
-import FormError from "./formerror";
+import FormError from "../components/formerror";
+import FormSuccess from "../components/formsuccess";
+import NavigationBase from "../components/navigation";
 
 const Wrapper = styled.div`
   display: flex;

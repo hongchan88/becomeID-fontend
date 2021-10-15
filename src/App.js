@@ -1,12 +1,15 @@
 import { ApolloProvider, useReactiveVar } from "@apollo/client";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { client, isLoggedInVar } from "./apollo";
-import Findconnect from "./findconnect";
+import Room from "./chatroom/room";
+import Rooms from "./chatroom/rooms";
+
+import Findconnect from "./menu/findconnect";
 import Home from "./home";
-import Login from "./login";
-import Profile from "./profile";
-import Register from "./register";
-import Signup from "./signup";
+import Login from "./loginSignup/login";
+
+import Register from "./menu/register";
+import Signup from "./loginSignup/signup";
 import { GlobalStyles } from "./styles";
 
 function App() {
@@ -31,8 +34,11 @@ function App() {
           <Route path="/findconnect" exact>
             {isLoggedIn ? <Findconnect /> : <Login />}
           </Route>
-          <Route path="/profile" exact>
-            {isLoggedIn ? <Profile /> : <Login />}
+          <Route path="/room" exact>
+            {isLoggedIn ? <Room /> : <Login />}
+          </Route>
+          <Route path="/rooms" exact>
+            {isLoggedIn ? <Rooms /> : <Login />}
           </Route>
         </Switch>
       </Router>
