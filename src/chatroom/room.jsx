@@ -231,6 +231,10 @@ const Room = (props) => {
         updateQuery,
       });
     }
+    if (hiddenMsg === true) {
+      setHiddenMsg(false);
+      console.log(hiddenMsg);
+    }
   }, [seeRoomData]);
 
   // run after loading finished ( !loading)
@@ -240,13 +244,8 @@ const Room = (props) => {
       MessageScroll.current.scrollIntoView({
         block: "end",
       });
-
-      if (hiddenMsg === true) {
-        setHiddenMsg(false);
-        console.log(hiddenMsg);
-      }
     }
-  }, [MessageScroll.current]);
+  }, [seeRoomData, MessageScroll.current]);
 
   return (
     <NavigationBase>
