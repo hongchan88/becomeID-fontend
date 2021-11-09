@@ -233,7 +233,7 @@ const Room = (props) => {
       });
       setSubscribed(true);
     }
-  }, [seeRoomData, subscribed]);
+  }, [seeRoomData]);
 
   // run after loading finished ( !loading)
   useEffect(() => {
