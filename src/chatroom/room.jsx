@@ -179,7 +179,6 @@ const Room = (props) => {
     reset();
   };
 
-  const [subscribed, setSubscribed] = useState(false);
   const client = useApolloClient();
   const updateQuery = (preQuery, options) => {
     const {
@@ -231,7 +230,6 @@ const Room = (props) => {
         },
         updateQuery,
       });
-      setSubscribed(true);
     }
   }, [seeRoomData]);
 
@@ -248,7 +246,7 @@ const Room = (props) => {
         console.log(hiddenMsg);
       }
     }
-  }, [seeRoomData, MessageScroll.current]);
+  }, [MessageScroll.current]);
 
   return (
     <NavigationBase>
