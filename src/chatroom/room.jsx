@@ -83,6 +83,7 @@ const MessageContainer = styled.div`
 `;
 
 const Message = styled.div`
+  visibility: ${(props) => (props.hidden ? "hidden" : "visible")};
   display: flex;
   color: black;
   border: solid 0.2px grey;
@@ -98,6 +99,19 @@ const Room = (props) => {
   const MessageScroll = useRef();
   const { data: meData } = useMe();
   const location = useLocation();
+  const [hiddenMsg, setHiddenMsg] = useState(true);
+
+  console.log(location?.state?.id);
+  const {
+    data: seeRoomData,
+    error,
+    loading,
+    subscribeToMore,
+  } = useQuery(SEE_ROOM_QUERY, {
+    variables: {
+      id: location?.state?.id,
+    },
+  });
 
   const { register, reset, setValue, handleSubmit, getValues } = useForm();
   const updateSendMessage = (cache, result) => {
@@ -165,17 +179,6 @@ const Room = (props) => {
     reset();
   };
 
-  const {
-    data: seeRoomData,
-    error,
-    loading,
-    subscribeToMore,
-  } = useQuery(SEE_ROOM_QUERY, {
-    variables: {
-      id: location?.state?.id,
-    },
-  });
-
   const [subscribed, setSubscribed] = useState(false);
   const client = useApolloClient();
   const updateQuery = (preQuery, options) => {
@@ -232,13 +235,20 @@ const Room = (props) => {
     }
   }, [seeRoomData, subscribed]);
 
+  // run after loading finished ( !loading)
   useEffect(() => {
     if (MessageScroll.current) {
+      console.log(MessageScroll.current);
       MessageScroll.current.scrollIntoView({
         block: "end",
       });
+
+      if (hiddenMsg === true) {
+        setHiddenMsg(false);
+        console.log(hiddenMsg);
+      }
     }
-  }, [seeRoomData]);
+  }, [seeRoomData, MessageScroll.current]);
 
   return (
     <NavigationBase>
@@ -251,6 +261,7 @@ const Room = (props) => {
                   outGoing={message.user.id !== location?.state?.id}
                 >
                   <Message
+                    hidden={hiddenMsg}
                     ref={MessageScroll}
                     outGoing={message.user.id !== location?.state?.id}
                   >

@@ -1,11 +1,22 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import NavigationBase from "../components/navigation";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import useMe from "../hook/useMe";
 import Pagination from "./pagination";
-import { AiFillMessage } from "react-icons/ai";
+import { AiFillMessage, AiTwotoneDelete } from "react-icons/ai";
 import { Link, useHistory } from "react-router-dom";
+
+const DELETE_ROOM = gql`
+  mutation deleteroom($id: Int!) {
+    deleteroom(id: $id) {
+      ok
+      error
+      roomId
+    }
+  }
+`;
+
 const SEE_ROOMS_QUERY = gql`
   query seeRooms {
     seeRooms {
@@ -47,14 +58,58 @@ const Container = styled.div`
   margin-bottom: 15px;
   border-radius: 10px;
 `;
+
+const ContainerBox = styled.div`
+  display: flex;
+  width: 90%;
+`;
+
+const DeleteBox = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 10%;
+`;
+
 let PageSize = 4;
 const Rooms = (props) => {
-  const { data, error, loading } = useQuery(SEE_ROOMS_QUERY);
+  const { data, error, loading, refetch } = useQuery(SEE_ROOMS_QUERY);
   const { data: meData } = useMe();
   const [filtered, setFiltered] = useState();
 
   const [currentPage, setcurrentPage] = useState(1);
   const history = useHistory();
+  useEffect(() => {
+    refetch();
+    console.log("refetched");
+  }, []);
+
+  const updatedDeleteRoom = (cache, result) => {
+    const {
+      deleteroom: { ok, error, roomId },
+    } = result.data;
+    if (!ok) {
+      alert("room is not exist");
+    } else {
+      const arrayData = cache.data.data[`Room:${roomId}`].messages;
+      cache.evict({ id: `Room:${roomId}` }); // delete chat room
+      arrayData.forEach((message) => {
+        cache.evict({ id: message.__ref }); // delete message cache foreach loop
+      });
+    }
+  };
+
+  const [deleteRoomMutation, { loading: deleteRoomLoading }] = useMutation(
+    DELETE_ROOM,
+    { update: updatedDeleteRoom }
+  );
+  const deleteRoom = (roomId) => {
+    console.log(deleteRoomLoading);
+    if (deleteRoomLoading) {
+      return;
+    }
+
+    deleteRoomMutation({ variables: { id: roomId } });
+  };
 
   const currentTableData = useMemo(() => {
     if (!loading) {
@@ -76,28 +131,38 @@ const Rooms = (props) => {
     <NavigationBase>
       <Wrapper>
         {currentTableData?.map((room) => (
-          <Container
-            onClick={() => {
-              console.log(room.id);
-              history.push("/room", {
-                id:
-                  meData?.me?.id === room?.users[1]?.id
-                    ? room?.users[2]?.id
-                    : room?.users[1]?.id,
-              });
-            }}
-          >
-            <div>
-              <AiFillMessage size="35" />
-            </div>
-            <InfoBox>
-              <p>
-                {room.users[0].car_plates === meData.me.car_plates
-                  ? room.users[1].car_plates
-                  : room.users[0].car_plates}
-              </p>
-              <p>total {room.totalPayloads} messages</p>
-            </InfoBox>
+          <Container>
+            <ContainerBox>
+              <div>
+                <AiFillMessage
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    history.push("/room", {
+                      id:
+                        meData?.me?.id === room.users[0].id
+                          ? room.users[1].id
+                          : room.users[0].id,
+                    });
+                  }}
+                  size="35"
+                />
+              </div>
+              <InfoBox>
+                <p>
+                  {room.users[0].car_plates === meData.me.car_plates
+                    ? room.users[1].car_plates
+                    : room.users[0].car_plates}
+                </p>
+                <p>total {room.totalPayloads} messages</p>
+              </InfoBox>
+            </ContainerBox>
+            <DeleteBox>
+              <AiTwotoneDelete
+                onClick={() => deleteRoom(room.id)}
+                style={{ cursor: "pointer" }}
+                size="25"
+              />
+            </DeleteBox>
           </Container>
         ))}
         {filtered ? (

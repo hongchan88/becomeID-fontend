@@ -3,6 +3,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 
 const Search = ({ data, myId }) => {
+  console.log(data);
   const resultData = data.map((key) => {
     return { ...key };
   });
