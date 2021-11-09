@@ -130,41 +130,44 @@ const Rooms = (props) => {
   return (
     <NavigationBase>
       <Wrapper>
-        {currentTableData?.map((room) => (
-          <Container>
-            <ContainerBox>
-              <div>
-                <AiFillMessage
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    history.push("/room", {
-                      id:
-                        meData?.me?.id === room.users[0].id
-                          ? room.users[1].id
-                          : room.users[0].id,
-                    });
-                  }}
-                  size="35"
-                />
-              </div>
-              <InfoBox>
-                <p>
-                  {room.users[0].car_plates === meData.me.car_plates
-                    ? room.users[1].car_plates
-                    : room.users[0].car_plates}
-                </p>
-                <p>total {room.totalPayloads} messages</p>
-              </InfoBox>
-            </ContainerBox>
-            <DeleteBox>
-              <AiTwotoneDelete
+        {currentTableData?.length === 0
+          ? "There is no chat rooms you are in"
+          : currentTableData?.map((room) => (
+              <Container>
+                <ContainerBox>
+                  <div>
+                    <AiFillMessage
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        history.push("/room", {
+                          id:
+                            meData?.me?.id === room.users[0].id
+                              ? room.users[1].id
+                              : room.users[0].id,
+                        });
+                      }}
+                      size="35"
+                    />
+                  </div>
+                  <InfoBox>
+                    <p>
+                      {room.users[0].car_plates === meData.me.car_plates
+                        ? room.users[1].car_plates
+                        : room.users[0].car_plates}
+                    </p>
+                    <p>total {room.totalPayloads} messages</p>
+                  </InfoBox>
+                </ContainerBox>
+                <DeleteBox>
+                  {/* //delete function development in progress  */}
+                  {/* <AiTwotoneDelete
                 onClick={() => deleteRoom(room.id)}
                 style={{ cursor: "pointer" }}
                 size="25"
-              />
-            </DeleteBox>
-          </Container>
-        ))}
+              /> */}
+                </DeleteBox>
+              </Container>
+            ))}
         {filtered ? (
           <Pagination
             className="pagination-bar"

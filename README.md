@@ -41,5 +41,6 @@ To view becomeID-backend with Prisma + Apollo + Graphql **[click here](https://g
 
 ## live chatting function
 
-- [] apollo subscription\
-- [] message write fragment in cache , modify cache\
+- [x] apollo subscription\
+- [x] message write fragment in cache , modify cache\
+- [] delete chat room function

@@ -33,7 +33,9 @@ const Findconnect = (props) => {
   return (
     <NavigationBase>
       <Wrapper>
-        {!loading ? (
+        {loading ? (
+          "Loading..."
+        ) : !loading ? (
           <Search data={data.allCarPlate} myId={meData?.me?.id} />
         ) : null}
       </Wrapper>

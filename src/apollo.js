@@ -28,11 +28,11 @@ export const logUserOut = () => {
 };
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:4000/graphql",
+  uri: "https://becomeid-backend.herokuapp.com/graphql",
 });
 
 const wsLink = new WebSocketLink({
-  uri: "ws://localhost:4000/graphql",
+  uri: "ws://becomeid-backend.herokuapp.com/graphql",
   options: {
     reconnect: true,
     connectionParams: () => ({
