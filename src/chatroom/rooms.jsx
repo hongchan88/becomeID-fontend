@@ -151,7 +151,7 @@ const Rooms = (props) => {
                   </div>
                   <InfoBox>
                     <p>
-                      {room.users[0].car_plates === meData.me.car_plates
+                      {room.users[0].car_plates === meData?.me?.car_plates
                         ? room.users[1].car_plates
                         : room.users[0].car_plates}
                     </p>
