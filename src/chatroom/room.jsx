@@ -101,7 +101,6 @@ const Room = (props) => {
   const location = useLocation();
   const [hiddenMsg, setHiddenMsg] = useState(true);
 
-  console.log(location?.state?.id);
   const {
     data: seeRoomData,
     error,
@@ -114,6 +113,7 @@ const Room = (props) => {
   });
 
   const { register, reset, setValue, handleSubmit, getValues } = useForm();
+  const { message } = getValues();
   const updateSendMessage = (cache, result) => {
     const {
       data: {
@@ -122,7 +122,7 @@ const Room = (props) => {
     } = result;
 
     if (ok && meData) {
-      const { message } = getValues();
+      console.log(message);
       setValue("message", "");
 
       const messageObj = {
@@ -135,6 +135,8 @@ const Room = (props) => {
 
         __typename: "Message",
       };
+      console.log(message, "update send message");
+
       const messageFragment = cache.writeFragment({
         fragment: gql`
           fragment NewMessage on Message {
@@ -148,7 +150,7 @@ const Room = (props) => {
         `,
         data: messageObj,
       });
-      console.log(cache, "cache");
+
       cache.modify({
         id: `Room:${seeRoomData?.seeRoom?.id}`,
         fields: {
@@ -157,8 +159,6 @@ const Room = (props) => {
           },
         },
       });
-
-      console.log(MessageScroll.current);
     }
   };
   const [sendMessageMutation, { loading: sendingMessage }] = useMutation(
@@ -186,9 +186,7 @@ const Room = (props) => {
         data: { roomUpdates: messageData },
       },
     } = options;
-    console.log(preQuery);
-    console.log("-------------");
-    console.log(options);
+
     console.log(messageData);
 
     if (messageData.id) {
@@ -213,6 +211,7 @@ const Room = (props) => {
               (aMessage) => aMessage.__ref === incomingMessage.__ref
             );
             if (existingMessages) {
+              console.log(existingMessages, "existing messages");
               return prev;
             }
             return [...prev, incomingMessage];
@@ -233,14 +232,12 @@ const Room = (props) => {
     }
     if (hiddenMsg === true) {
       setHiddenMsg(false);
-      console.log(hiddenMsg);
     }
   }, [seeRoomData]);
 
   // run after loading finished ( !loading)
   useEffect(() => {
     if (MessageScroll.current) {
-      console.log(MessageScroll.current);
       MessageScroll.current.scrollIntoView({
         block: "end",
       });
