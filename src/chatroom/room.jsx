@@ -155,6 +155,13 @@ const Room = (props) => {
         id: `Room:${seeRoomData?.seeRoom?.id}`,
         fields: {
           messages(prev) {
+            console.log(prev);
+            const existingMessages = prev.find(
+              (aMessage) => aMessage.__ref === messageFragment.__ref
+            );
+            if (existingMessages) {
+              return prev;
+            }
             return [...prev, messageFragment];
           },
         },
@@ -242,7 +249,7 @@ const Room = (props) => {
         block: "end",
       });
     }
-  }, [seeRoomData, MessageScroll.current]);
+  }, [seeRoomData]);
 
   return (
     <NavigationBase>
@@ -253,10 +260,10 @@ const Room = (props) => {
               return (
                 <MessageContainer
                   outGoing={message.user.id !== location?.state?.id}
+                  ref={MessageScroll}
                 >
                   <Message
                     hidden={hiddenMsg}
-                    ref={MessageScroll}
                     outGoing={message.user.id !== location?.state?.id}
                   >
                     {location?.state?.id == message.user.id
