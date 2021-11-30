@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 120%;
+  width: 100%;
 `;
 
 const GET_ALL_USER = gql`

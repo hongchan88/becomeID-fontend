@@ -23,7 +23,7 @@ const TopBox = styled(WhiteBox)`
   flex-direction: column;
   padding: 35px 40px 25px 40px;
   margin-bottom: 10px;
-  height: 50vh;
+  height: 80vh;
   font-size: 1.2rem;
   color: #808080;
   form {
@@ -44,38 +44,12 @@ const Wrapper = styled.div`
   width: 100%;
 `;
 
-const Separator = styled.div`
-  margin: 20px 0px 30px 0px;
-  text-transform: uppercase;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  align-items: center;
-  div {
-    width: 100%;
-    height: 1px;
-    background-color: rgb(219, 219, 219);
-  }
-  span {
-    margin: 0px 10px;
-    font-weight: 600;
-    color: #8e8e8e;
-  }
-`;
-
 const Navigation = styled.ul`
   display: flex;
   justify-content: space-evenly;
   margin-bottom: 0.8em;
 `;
-const Logout = styled.div`
-  display: relative;
-`;
 
-const LogoutBtn = styled.div`
-  display: absolute;
-  right: 10px;
-`;
 const NavigationBase = (props) => (
   <Container>
     <Wrapper>

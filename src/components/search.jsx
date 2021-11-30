@@ -11,7 +11,7 @@ const Search = ({ data, myId }) => {
   const history = useHistory();
 
   return (
-    <div style={{ width: "95%", height: "95%", fontSize: "0.8rem" }}>
+    <div style={{ width: "100%", height: "100%", fontSize: "0.8rem" }}>
       <MaterialTable
         title=""
         columns={[

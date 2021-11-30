@@ -240,7 +240,7 @@ const Room = (props) => {
     if (hiddenMsg === true) {
       setHiddenMsg(false);
     }
-  }, [seeRoomData]);
+  }, [seeRoomData, MessageScroll.current]);
 
   // run after loading finished ( !loading)
   useEffect(() => {
@@ -249,7 +249,7 @@ const Room = (props) => {
         block: "end",
       });
     }
-  }, [seeRoomData]);
+  }, [seeRoomData, MessageScroll.current]);
 
   return (
     <NavigationBase>
